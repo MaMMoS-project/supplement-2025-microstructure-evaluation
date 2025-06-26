@@ -13,3 +13,6 @@ The explicitly required software packages are recorded the `pixi.toml` file.
 Fixed versions of all dependencies are stored in `pixi.lock`.
 
 **Note**: Only Linux is supported, because esys-escript on conda-forge is only available for Linux.
+
+Mesh files in `.fly` format are managed with git lfs, see https://git-lfs.com/ for details on how 
+to install and use it.
