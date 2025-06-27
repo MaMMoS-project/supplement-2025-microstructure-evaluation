@@ -7,7 +7,7 @@ different grains and two different temperatures.
 To run the script you need [pixi](https://pixi.sh). Then:
 
 1. Install the required dependencies: `pixi install --frozen`
-2. Run the script in the new environment: `pixi run python3 hard-magnet-grains.py**
+2. Run the script in the new environment: `pixi run python3 hard-magnet-grains.py`
 
 The explicitly required software packages are recorded the `pixi.toml` file.
 Fixed versions of all dependencies are stored in `pixi.lock`.
