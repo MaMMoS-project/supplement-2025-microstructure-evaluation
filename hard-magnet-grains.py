@@ -129,11 +129,11 @@ for size, gsize in zip(CUBESIZES, GRAINSIZES):
             # results_hysteresis = mammos_mumag.hysteresis.run(
             results_hysteresis = hysteresis.run(
                 mesh_filepath=mesh_filepath,
-                # Alex: changed Ms, A, K1 to be lists now
-                Ms=[results_kuzmin.Ms(temperature)] * (numgrains + 1),  # grains + boundary
-                A=[results_kuzmin.A(temperature)] * (numgrains + 1),  # grains + boundary
-                K1=[results_kuzmin.K1(temperature)] * (numgrains + 1),  # grains + boundary
-                # We need to multiply for (numgrains + 1) to include the boundary, too.
+                # Parameters on the boundary are all zero:
+                # all parameter lists are appended a zero value.
+                Ms=[results_kuzmin.Ms(temperature)] * numgrains + [me.Ms()],
+                A=[results_kuzmin.A(temperature)] * numgrains + [me.A()],
+                K1=[results_kuzmin.K1(temperature)] * numgrains + [me.Ku()],
                 theta=np.concatenate((thetas, [0.0])), # add boundary value
                 phi=np.concatenate((phis, [0.0])), # add boundary value
                 # (Bonus Ontology Quest) try to specify anisotropy field Hani of the material below
