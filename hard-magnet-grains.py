@@ -16,9 +16,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import colormaps
 
-# importing another expanded hysteresis.py
-import hysteresis
-
+from mammos_mumag import hysteresis
 
 def randomDisc(n):
     w = np.random.uniform(-np.pi, np.pi, n)
@@ -110,12 +108,12 @@ for size, gsize in zip(CUBESIZES, GRAINSIZES):
             print("-" * 10)
             print(f"sim {size}x{size}x{size} cube, filled with {shape} at {temperature} K")
             print("-" * 10)
-            Js_T = results_kuzmin.Ms(temperature).to(u.T)
+            Js_T = results_kuzmin.Ms(temperature).q.to(u.T)
             K1_T = results_kuzmin.K1(temperature)
             A_T = results_kuzmin.A(temperature)
-            delta_0 = np.sqrt(A_T / K1_T)
-            lex = np.sqrt((A_T * 4 * np.pi * 1e-7) / (Js_T**2))
-            h_ani = ((2 * K1_T) / Js_T).to(u.T)
+            delta_0 = np.sqrt(A_T.q / K1_T.q)
+            lex = np.sqrt((A_T.q * 4 * np.pi * 1e-7) / (Js_T**2))
+            h_ani = ((2 * K1_T.q) / Js_T).to(u.T)
 
             # arXiv:1603.08239v1 [cond-mat.mtrl-sci]
             # n = 0.27 ... forgot what this controls ...
@@ -132,23 +130,23 @@ for size, gsize in zip(CUBESIZES, GRAINSIZES):
             results_hysteresis = hysteresis.run(
                 mesh_filepath=mesh_filepath,
                 # Alex: changed Ms, A, K1 to be lists now
-                Ms=[results_kuzmin.Ms(temperature)] * numgrains,  # XXX currently equal entries
-                A=[results_kuzmin.A(temperature)] * numgrains,  # XXX currently equal entries
-                K1=[results_kuzmin.K1(temperature)] * numgrains,  # XXX currently equal entries
-                theta=thetas,
-                phi=phis,
+                Ms=[results_kuzmin.Ms(temperature)] * (numgrains + 1),  # grains + boundary
+                A=[results_kuzmin.A(temperature)] * (numgrains + 1),  # grains + boundary
+                K1=[results_kuzmin.K1(temperature)] * (numgrains + 1),  # grains + boundary
+                # We need to multiply for (numgrains + 1) to include the boundary, too.
+                theta=np.concatenate((thetas, [0.0])), # add boundary value
+                phi=np.concatenate((phis, [0.0])), # add boundary value
                 # (Bonus Ontology Quest) try to specify anisotropy field Hani of the material below
                 # if Hani is wrong expression, then let's say, theoretical maximum switching field.
                 # hstart=(7 * u.T).to(u.A / u.m),
                 # hfinal=(-7 * u.T).to(u.A / u.m),
                 hstart=(2.0 * u.T).to(u.A / u.m),
                 hfinal=(-2.0 * u.T).to(u.A / u.m),
-                # mfinal=-2., # XXX if I try this it does not work ... maybe because of ontology
-                # or because of something else, I changed it now inside hysteresis.py I think
-                # similar behaviour with hsteps or hstep ...
+                mfinal=-2.,
                 hnsteps=400,
                 # hnsteps=30,
                 # hnsteps=4000,
+                outdir=f"{shape}-{size}",
             )
             simulations.append(results_hysteresis)
 
